@@ -1,0 +1,169 @@
+@startuml
+title CircuitIQ - Sprint 1 Setup and Development Workflow
+
+start
+
+partition "Development Environment" {
+
+    :Verify Node.js;
+    :Verify npm;
+    :Verify Git;
+
+    :Install / Verify Java JDK 17;
+
+    :Configure Android SDK;
+
+    :Configure ANDROID_HOME;
+
+    :Add platform-tools to PATH;
+
+    :Verify ADB;
+
+    :Start Pixel 7 Android Emulator;
+
+    :Run adb devices;
+
+    if (Pixel 7 detected?) then (Yes)
+        :Android environment ready;
+    else (No)
+        :Troubleshoot ADB / Emulator;
+    endif
+}
+
+partition "Local Git Repository" {
+
+    :Create CircuitIQ project directory;
+
+    :Run git init;
+
+    :Rename default branch to main;
+
+    :Verify git status;
+
+    note right
+        Git provides LOCAL
+        version control.
+    end note
+}
+
+partition "Expo Application" {
+
+    :Create Expo project;
+
+    :Select Expo SDK 57;
+
+    :Use blank TypeScript template;
+
+    :Install npm dependencies;
+
+    :Generate package-lock.json;
+
+    :Start Metro Bundler;
+
+    :Run CircuitIQ through Expo Go;
+
+    :Deploy to Pixel 7 Emulator;
+
+    if (Application launches?) then (Yes)
+        :Expo environment verified;
+    else (No)
+        :Debug Expo / Metro / ADB;
+    endif
+}
+
+partition "Repository Hygiene" {
+
+    :Review .gitignore;
+
+    :Ignore node_modules;
+
+    :Ignore .expo;
+
+    :Ignore .env files;
+
+    :Create .env.example;
+
+    :Create README.md;
+
+    :Create VERSIONS.md;
+
+    :Create CHANGELOG.md;
+
+    :Keep AGENTS.md;
+
+    :Remove unwanted LICENSE;
+
+    :Set CircuitIQ version to 0.1.0;
+
+    note right
+        Real secrets must never
+        be committed to Git.
+    end note
+}
+
+partition "Git Workflow" {
+
+    :Run git status;
+
+    :Run git add .;
+
+    note right
+        git add moves changes
+        into the staging area.
+    end note
+
+    :Run git status again;
+
+    :Run git commit;
+
+    note right
+        Commit creates a snapshot
+        in LOCAL Git history.
+    end note
+
+    :Verify working tree clean;
+
+    :Inspect git log;
+}
+
+partition "GitHub Remote Repository" {
+
+    :Create GitHub repository;
+
+    note right
+        GitHub provides REMOTE
+        repository hosting and
+        collaboration.
+    end note
+
+    :Add GitHub as origin;
+
+    :Run git remote -v;
+
+    :Run git push -u origin main;
+
+    :Authenticate with GitHub;
+
+    :Upload local commit history;
+
+    :Set main to track origin/main;
+
+    :Verify git status;
+
+    :Verify git branch -vv;
+}
+
+partition "Current CircuitIQ State" {
+
+    :Local main and origin/main synchronized;
+
+    :Working tree clean;
+
+    :CircuitIQ v0.1.0 foundation stored locally and remotely;
+
+    :Ready for application development;
+}
+
+stop
+
+@enduml
