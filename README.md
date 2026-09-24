@@ -4,7 +4,7 @@ CircuitIQ is an AI-powered electrical field intelligence platform designed for e
 
 ## Project Goal
 
-CircuitIQ is being developed to support electrical asset identification, equipment scanning, field inspections, technical information retrieval, and AI-assisted electrical workflows. CircuitIQ has the hopes of making electrical field  work more efficent, managable, and organized as compared to current market products. 
+CircuitIQ is being developed to support electrical asset identification, equipment scanning, field inspections, technical information retrieval, and AI-assisted electrical workflows. CircuitIQ aims to make electrical fieldwork more efficient, manageable, and organized than current market products. 
 
 ## Current Milestone
 
@@ -119,8 +119,6 @@ CircuitIQ is designed to demonstrate practical software engineering concepts bey
 - Human verification of AI-generated information
 
 ### AI-Oriented Architecture
-
-Sprint 1 prepares CircuitIQ for future AI functionality by establishing:
 
 - Structured scan-result models
 - Confidence values
