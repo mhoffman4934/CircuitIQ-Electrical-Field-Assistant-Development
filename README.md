@@ -20,6 +20,8 @@ CircuitIQ is being developed to support electrical asset identification, equipme
 - Android
 - Git
 - GitHub
+- Firebase
+- 
 
 ## Development Environment
 
