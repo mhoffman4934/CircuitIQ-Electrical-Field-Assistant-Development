@@ -10,6 +10,7 @@ CircuitIQ is being developed to support electrical asset identification, equipme
 
 **v0.1.0 — Mobile Foundation & Electrical Field Prototype**
 **v0.1.0 — Trial Interface Iterations -(9/24/2026)**
+**v0.1.0 - Login Authentication using Firebase and Signout Component (10/4/2026)**
 
 ## Technology
 
@@ -21,7 +22,7 @@ CircuitIQ is being developed to support electrical asset identification, equipme
 - Git
 - GitHub
 - Firebase
-- 
+- Unsplash
 
 ## Development Environment
 
@@ -45,13 +46,9 @@ Real credentials belong in local `.env` files excluded through `.gitignore`.
 
 `.env.example` documents required environment variables without exposing real values.
 
-## Project Status
+## Development Practice and Architecture
 
-CircuitIQ is currently under active development.
-
-## Concepts Demonstrated
-
-CircuitIQ is designed to demonstrate practical software engineering concepts beyond basic mobile UI development.
+CircuitIQ aims to demonstrate practical software engineering concepts beyond basic mobile UI development.
 
 ### Mobile Application Development
 
@@ -81,13 +78,6 @@ CircuitIQ is designed to demonstrate practical software engineering concepts bey
 
 - Local version control using Git
 - Remote repository hosting using GitHub
-- Working directory, staging area, and commit workflow
-- `git status`
-- `git add`
-- `git commit`
-- `git pull`
-- `git push`
-- Meaningful commit messages
 - Incremental development history
 - Repository hygiene
 
@@ -120,7 +110,7 @@ CircuitIQ is designed to demonstrate practical software engineering concepts bey
 - Electrical equipment scan workflow design
 - Human verification of AI-generated information
 
-### AI-Oriented Architecture
+### Future Work -- AI-Oriented Architecture 
 
 - Structured scan-result models
 - Confidence values
@@ -310,4 +300,6 @@ If the Expo development server needs to be restarted:
 npx expo start
 
 ```
+## Project Status
 
+CircuitIQ is currently under active development.
