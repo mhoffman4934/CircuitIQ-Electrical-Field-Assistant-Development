@@ -9,7 +9,9 @@ CircuitIQ is being developed to support electrical asset identification, equipme
 ## Current Milestone
 
 **v0.1.0 — Mobile Foundation & Electrical Field Prototype**
+
 **v0.1.0 — Trial Interface Iterations -(9/24/2026)**
+
 **v0.2.0 - Login Authentication using Firebase and Signout Component (10/4/2026)**
 
 ## Technology
