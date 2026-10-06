@@ -12,7 +12,8 @@ import {
   View,
 } from "react-native";
 
-import { router } from "expo-router";
+import { FirebaseError } from "firebase/app";
+import { useAuth } from "../context/AuthContext";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 type LoginErrors = {
@@ -21,6 +22,13 @@ type LoginErrors = {
 };
 
 export default function LoginScreen() {
+
+
+  const { login } = useAuth();
+
+const [authError, setAuthError] = useState("");
+const [isSubmitting, setIsSubmitting] = useState(false);
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -47,14 +55,60 @@ export default function LoginScreen() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     if (!validateForm()) {
       return;
     }
-
-    // Sprint 1 mock authentication.
-    router.replace("/dashboard");
+  
+    setAuthError("");
+  
+    try {
+      setIsSubmitting(true);
+  
+      await login(email, password);
+    } catch (error) {
+      if (error instanceof FirebaseError) {
+        switch (error.code) {
+          case "auth/invalid-email":
+            setAuthError("Please enter a valid email address.");
+            break;
+  
+          case "auth/invalid-credential":
+            setAuthError("Incorrect email or password.");
+            break;
+  
+          case "auth/user-disabled":
+            setAuthError("This account has been disabled.");
+            break;
+  
+          case "auth/too-many-requests":
+            setAuthError(
+              "Too many login attempts. Please try again later."
+            );
+            break;
+  
+          case "auth/network-request-failed":
+            setAuthError(
+              "Network error. Check your connection."
+            );
+            break;
+  
+          default:
+            setAuthError(
+              "Unable to sign in. Please try again."
+            );
+        }
+      } else {
+        setAuthError(
+          "Unable to sign in. Please try again."
+        );
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
   };
+
+    //authentication handling
 
   const handleBiometrics = () => {
     Alert.alert(
@@ -73,7 +127,7 @@ export default function LoginScreen() {
   const handleForgotPassword = () => {
     Alert.alert(
       "Password Recovery",
-      "Password recovery will be connected to the CircuitIQ authentication service."
+      "Password recovery will be connected to Firebase after login authentication is verified."
     );
   };
 
@@ -236,18 +290,27 @@ export default function LoginScreen() {
               </Text>
             </Pressable>
 
+            {authError ? (
+                <Text style={styles.authError}>
+                    {authError}
+                </Text>
+              ) : null}
+
             {/* SIGN IN */}
 
             <Pressable
-              style={({ pressed }) => [
-                styles.signInButton,
-                pressed && styles.signInPressed,
-              ]}
-              onPress={handleLogin}
-            >
-              <Text style={styles.signInText}>Sign In</Text>
-              <Text style={styles.signInArrow}>→</Text>
-            </Pressable>
+                  style={[
+                      styles.signInButton,
+                       isSubmitting && { opacity: 0.6 },
+                    ]}
+                    onPress={handleLogin}
+                    disabled={isSubmitting}
+                  >
+                      <Text style={styles.signInText}>
+                       {isSubmitting ? "Signing In..." : "Sign In"}
+                      </Text>
+                      <Text style={styles.signInArrow}>→</Text>
+              </Pressable>
 
             {/* DIVIDER */}
 
@@ -744,4 +807,12 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginTop: 17,
   },
+
+  authError: {
+    color: "#DC2626",
+    fontSize: 14,
+    marginTop: 8,
+    marginBottom: 8,
+  },
+
 });

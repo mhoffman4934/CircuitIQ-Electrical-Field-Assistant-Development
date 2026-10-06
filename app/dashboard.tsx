@@ -1,22 +1,40 @@
-import { router } from "expo-router";
+import { useAuth } from "../context/AuthContext";
+
 import {
   SafeAreaView,
   StyleSheet,
   Text,
-  TouchableOpacity,
+  Pressable,
 } from "react-native";
 
 export default function DashboardScreen() {
+  const { logout } = useAuth();
+
+  const handleSignOut = async () => {
+    try {
+      await logout();
+    } catch (error) {
+      console.error("Sign out failed:", error);
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>CircuitIQ Dashboard</Text>
+      <Text style={styles.title}>
+        CircuitIQ Dashboard
+      </Text>
 
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => router.replace("/")}
+      <Pressable
+        onPress={handleSignOut}
+        style={({ pressed }) => [
+          styles.signOutButton,
+          pressed && styles.signOutButtonPressed,
+        ]}
       >
-        <Text style={styles.buttonText}>Sign Out</Text>
-      </TouchableOpacity>
+        <Text style={styles.signOutButtonText}>
+          Sign Out
+        </Text>
+      </Pressable>
     </SafeAreaView>
   );
 }
@@ -37,7 +55,7 @@ const styles = StyleSheet.create({
     marginBottom: 30,
   },
 
-  button: {
+  signOutButton: {
     borderWidth: 1,
     borderColor: "#F4C430",
     paddingHorizontal: 40,
@@ -45,7 +63,11 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
 
-  buttonText: {
+  signOutButtonPressed: {
+    opacity: 0.7,
+  },
+
+  signOutButtonText: {
     color: "#F4C430",
     fontWeight: "700",
   },
