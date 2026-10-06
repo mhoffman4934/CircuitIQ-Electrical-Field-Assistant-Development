@@ -58,4 +58,26 @@ Last audited: September 22, 2026
 
 CircuitIQ uses a Pixel 7 Android Virtual Device running Android 17 as its primary development and testing platform.
 
-Versions recorded here establish the Sprint 1 baseline for future CircuitIQ version audits.
+Versions recorded here establish the baseline for future CircuitIQ version audits.
+
+## In-Progress 
+
+1. Finish dashboard design
+2. Build asset list/details UI
+3. Define asset + product-model data fields
+4. Set up NestJS
+5. Set up PostgreSQL + Prisma
+6. Connect real asset data
+7. Build scanning workflow
+8. Add inspections
+9. Add work orders
+
+React Native / Expo
+        ↓
+Firebase Authentication
+        ↓
+NestJS API
+        ↓
+Prisma
+        ↓
+PostgreSQL
