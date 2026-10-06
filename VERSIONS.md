@@ -62,7 +62,7 @@ Versions recorded here establish the baseline for future CircuitIQ version audit
 
 ## In-Progress 
 
-1. Finish dashboard design
+1. Finish dashboard ADOBExd\FIGMA GUI design
 2. Build asset list/details UI
 3. Define asset + product-model data fields
 4. Set up NestJS
