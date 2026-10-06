@@ -119,8 +119,6 @@ CircuitIQ aims to demonstrate practical software engineering concepts beyond bas
 - Separation between UI and future AI services
 - A design that allows mock scan data to later be replaced by real multimodal AI responses
 
-# BLA01 Mobile Application Development
-
 ## Installation & Running
 
 ### Prerequisites
