@@ -8,11 +8,13 @@ CircuitIQ is being developed to support electrical asset identification, equipme
 
 ## Current Milestone
 
-**v0.1.0 — Mobile Foundation & Electrical Field Prototype**
+**v0.1.0 - Mobile Foundation & Electrical Field Prototype**
 
-**v0.1.0 — Trial Interface Iterations -(9/24/2026)**
+**v0.1.0 - Trial Interface Iterations -(9/24/2026)**
 
 **v0.2.0 - Login Authentication using Firebase and Signout Component (10/4/2026)**
+
+**v0.3.0 - Currently in progress with dashboard UI and app design direction (10/6/2026)**
 
 ## Technology
 
@@ -43,10 +45,6 @@ Runtime:
 ## Security
 
 Secrets, API keys, credentials, and private environment variables must never be committed to this repository.
-
-Real credentials belong in local `.env` files excluded through `.gitignore`.
-
-`.env.example` documents required environment variables without exposing real values.
 
 ## Development Practice and Architecture
 
@@ -302,6 +300,35 @@ If the Expo development server needs to be restarted:
 npx expo start
 
 ```
+## (Progress Notes)
+
+CircuitIQ has helped me understand how a mobile application works beyond the user interface. Through this project, I have learned how the UI, application logic, authentication state, navigation, and project structure work together to create a functional mobile application.
+
+One of the main challenges has been integrating Firebase Authentication with React Native and Expo while maintaining persistent user sessions and protected application routes. This helped me better understand authentication state management, dependency compatibility, environment configuration, and how different parts of a mobile application communicate with each other.
+
+ Using Git and GitHub throughout development has helped me better understand branching, merging, commits, version tracking, and maintaining a clean development history.
+
+As CircuitIQ continues to grow, the next major areas of development will include the dashboard, asset management, equipment scanning, inspections, work orders, and eventually a NestJS/PostgreSQL backend.
+I will continue to update this section as this project grows and comes together. 
+
+---
+
+## YouTube
+
+- [Marcin Hoffman — Computer Science YouTube Channel](https://www.youtube.com/@MarcinHoffman-CS)
+
+---
+
+## LinkedIn
+
+Project updates and development progress are also posted on LinkedIn:
+
+- [Marcin Hoffman — LinkedIn](https://www.linkedin.com/in/marcin-hoffman-935423282/)
+
+---
+
+
 ## Project Status
 
 CircuitIQ is currently under active development.
+
