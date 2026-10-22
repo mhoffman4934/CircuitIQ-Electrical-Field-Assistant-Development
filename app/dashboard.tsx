@@ -1,793 +1,129 @@
-import type { ComponentProps } from "react";
-import { Ionicons } from "@expo/vector-icons";
-import { StatusBar } from "expo-status-bar";
+import { useState, type ComponentProps } from 'react';
+import { router } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
+import { StatusBar } from 'expo-status-bar';
+import { Alert, Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useAuth } from '../context/AuthContext';
+import { useApiResource } from '../hooks/useApiResource';
+import { Action, LoadState, colors, ui } from '../components/Screen';
+import type { Dashboard } from '../types/api';
 
-import {
-  Alert,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
-
-import { SafeAreaView } from "react-native-safe-area-context";
-
-import { useAuth } from "../context/AuthContext";
-
-type IconName = ComponentProps<typeof Ionicons>["name"];
-
-type MetricCardProps = {
-  icon: IconName;
-  label: string;
-  value: string;
-  valueColor?: string;
-  onPress: () => void;
-};
-
-type ActivityItem = {
-  asset: string;
-  description: string;
-  date: string;
-  icon: IconName;
-};
-
-type NavItemProps = {
-  icon: IconName;
-  label: string;
-  active?: boolean;
-  onPress: () => void;
-};
-
-/*
-  TEMPORARY PLACEHOLDER DATA
-
-  This will eventually be replaced with data
-  returned from the CircuitIQ backend/PostgreSQL.
-*/
-const recentActivity: ActivityItem[] = [
-  {
-    asset: "ASSET-001",
-    description: "Scan completed",
-    date: "MM/DD/YYYY",
-    icon: "scan-outline",
-  },
-  {
-    asset: "ASSET-002",
-    description: "Inspection completed",
-    date: "MM/DD/YYYY",
-    icon: "clipboard-outline",
-  },
-  {
-    asset: "ASSET-003",
-    description: "Work order created",
-    date: "MM/DD/YYYY",
-    icon: "construct-outline",
-  },
-];
-
-function MetricCard({
-  icon,
-  label,
-  value,
-  valueColor = "#FFFFFF",
-  onPress,
-}: MetricCardProps) {
-  return (
-    <Pressable
-      onPress={onPress}
-      style={({ pressed }) => [
-        styles.metricCard,
-        pressed && styles.pressed,
-      ]}
-    >
-      <View style={styles.metricIcon}>
-        <Ionicons
-          name={icon}
-          size={24}
-          color="#E8EEF6"
-        />
-      </View>
-
-      <View style={styles.metricText}>
-        <Text style={styles.metricLabel}>
-          {label}
-        </Text>
-
-        <Text
-          style={[
-            styles.metricValue,
-            { color: valueColor },
-          ]}
-        >
-          {value}
-        </Text>
-      </View>
-
-      <Ionicons
-        name="chevron-forward"
-        size={20}
-        color="#8290A2"
-      />
-    </Pressable>
-  );
-}
-
-function NavItem({
-  icon,
-  label,
-  active = false,
-  onPress,
-}: NavItemProps) {
-  return (
-    <Pressable
-      onPress={onPress}
-      style={({ pressed }) => [
-        styles.navItem,
-        pressed && styles.pressed,
-      ]}
-    >
-      <Ionicons
-        name={icon}
-        size={23}
-        color={
-          active ? "#278CFF" : "#8B97A8"
-        }
-      />
-
-      <Text
-        style={[
-          styles.navLabel,
-          active && styles.navLabelActive,
-        ]}
-      >
-        {label}
-      </Text>
-    </Pressable>
-  );
+type Icon = ComponentProps<typeof Ionicons>['name'];
+function Metric({ icon, label, value, onPress }: { icon: Icon; label: string; value: string; onPress?: () => void }) {
+  return <Pressable accessibilityRole={onPress ? 'button' : undefined} disabled={!onPress} accessibilityState={{ disabled: !onPress }}
+    onPress={onPress} style={({ pressed }) => [styles.metric, pressed && { opacity: 0.65 }]}>
+    <Ionicons name={icon} size={24} color={onPress ? colors.blue : colors.muted} />
+    <Text style={styles.metricLabel}>{label}</Text><Text style={styles.metricValue}>{value}</Text>
+  </Pressable>;
 }
 
 export default function DashboardScreen() {
-  const { logout } = useAuth();
+  const { user, logout } = useAuth();
+  const { data, error, loading, reload } = useApiResource<Dashboard>('/dashboard');
+  const [signingOut, setSigningOut] = useState(false);
+  const displayName = user?.displayName?.trim() || user?.email?.split('@')[0] || 'Welcome';
+  const initials = displayName.split(/\s+/).slice(0, 2).map(part => part[0]).join('').toUpperCase();
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? 'Good morning,' : hour < 18 ? 'Good afternoon,' : 'Good evening,';
+  const hasWorkspace = !!data?.workspace && !loading;
 
-  /*
-    Temporary handler for features that have
-    not been implemented yet.
-  */
-  const comingSoon = (feature: string) => {
-    Alert.alert(
-      feature,
-      `${feature} has not been implemented yet.`
-    );
+  const account = () => {
+    if (signingOut) return;
+    Alert.alert(user?.displayName || 'Your account', user?.email || 'Signed in', [
+      { text: 'Close', style: 'cancel' },
+      { text: 'Sign Out', style: 'destructive', onPress: async () => {
+        setSigningOut(true);
+        try { await logout(); }
+        catch { Alert.alert('Sign Out Failed', 'Unable to sign out. Please try again.'); }
+        finally { setSigningOut(false); }
+      } },
+    ]);
   };
 
-  /*
-    Temporary account menu.
-
-    Sign Out remains functional while the
-    full Account / More screen is still
-    under development.
-  */
-  const handleAccount = () => {
-    Alert.alert(
-      "Account",
-      "Account functionality will be added in a future feature.",
-      [
-        {
-          text: "Cancel",
-          style: "cancel",
-        },
-        {
-          text: "Sign Out",
-          style: "destructive",
-
-          onPress: async () => {
-            try {
-              await logout();
-            } catch (error) {
-              console.error(
-                "Sign out failed:",
-                error
-              );
-
-              Alert.alert(
-                "Sign Out Failed",
-                "Unable to sign out. Please try again."
-              );
-            }
-          },
-        },
-      ]
-    );
-  };
-
-  return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar style="light" />
-
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.content}
-      >
-        {/* HEADER */}
-        <View style={styles.header}>
-          <Text style={styles.logo}>
-            Circuit
-            <Text style={styles.logoAccent}>
-              IQ
-            </Text>
-          </Text>
-
-          <Pressable
-            onPress={handleAccount}
-            style={({ pressed }) => [
-              styles.avatar,
-              pressed && styles.pressed,
-            ]}
-          >
-            <Text style={styles.avatarText}>
-              FN
-            </Text>
-          </Pressable>
-        </View>
-
-        {/* USER / COMPANY PLACEHOLDERS */}
-        <View style={styles.welcome}>
-          <Text style={styles.greeting}>
-            Good morning,
-          </Text>
-
-          <Text style={styles.name}>
-            First Name
-          </Text>
-
-          <Text style={styles.company}>
-            Company Name
-          </Text>
-        </View>
-
-        {/* PRIMARY SCAN ACTION */}
-        <Pressable
-          onPress={() =>
-            comingSoon("Scan Equipment")
-          }
-          style={({ pressed }) => [
-            styles.scanButton,
-            pressed && styles.pressed,
-          ]}
-        >
-          <View style={styles.scanIcon}>
-            <Ionicons
-              name="camera-outline"
-              size={31}
-              color="#FFFFFF"
-            />
-          </View>
-
-          <Text style={styles.scanText}>
-            Scan Equipment
-          </Text>
-
-          <Ionicons
-            name="chevron-forward"
-            size={27}
-            color="#FFFFFF"
-          />
+  return <SafeAreaView style={styles.container}>
+    <StatusBar style="light" />
+    <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}
+      refreshControl={<RefreshControl refreshing={loading} onRefresh={() => void reload()} tintColor={colors.blue} colors={[colors.blue]} />}>
+      <View style={styles.header}>
+        <Text style={styles.logo}>Circuit<Text style={{ color: colors.blue }}>IQ</Text></Text>
+        <Pressable accessibilityRole="button" accessibilityLabel="Account and sign out" disabled={signingOut} onPress={account} style={styles.avatar}>
+          <Text style={styles.avatarText}>{signingOut ? '…' : initials}</Text>
         </Pressable>
-
-        {/* DASHBOARD SUMMARY */}
-        <View style={styles.metricsGrid}>
-          <MetricCard
-            icon="cube-outline"
-            label="Assets"
-            value="000"
-            onPress={() =>
-              comingSoon("Assets")
-            }
-          />
-
-          <MetricCard
-            icon="clipboard-outline"
-            label="Inspections"
-            value="0 Due"
-            valueColor="#F4C430"
-            onPress={() =>
-              comingSoon("Inspections")
-            }
-          />
-
-          <MetricCard
-            icon="construct-outline"
-            label="Work Orders"
-            value="0 Open"
-            valueColor="#35DF84"
-            onPress={() =>
-              comingSoon("Work Orders")
-            }
-          />
-
-          <MetricCard
-            icon="camera-outline"
-            label="Scans"
-            value="00"
-            onPress={() =>
-              comingSoon("Scans")
-            }
-          />
-        </View>
-
-        {/* RECENT ACTIVITY */}
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>
-            Recent Activity
-          </Text>
-
-          <Pressable
-            onPress={() =>
-              comingSoon("Activity History")
-            }
-          >
-            <Text style={styles.viewAll}>
-              View All
-            </Text>
-          </Pressable>
-        </View>
-
-        <View style={styles.activityCard}>
-          {recentActivity.map(
-            (activity, index) => (
-              <View key={activity.asset}>
-                <Pressable
-                  onPress={() =>
-                    comingSoon(
-                      activity.asset
-                    )
-                  }
-                  style={({ pressed }) => [
-                    styles.activityRow,
-                    pressed && styles.pressed,
-                  ]}
-                >
-                  <View
-                    style={
-                      styles.activityIcon
-                    }
-                  >
-                    <Ionicons
-                      name={activity.icon}
-                      size={23}
-                      color="#E8EEF6"
-                    />
-                  </View>
-
-                  <View
-                    style={
-                      styles.activityInfo
-                    }
-                  >
-                    <Text
-                      style={
-                        styles.activityAsset
-                      }
-                    >
-                      {activity.asset}
-                    </Text>
-
-                    <Text
-                      style={
-                        styles.activityDescription
-                      }
-                    >
-                      {
-                        activity.description
-                      }
-                    </Text>
-
-                    <Text
-                      style={
-                        styles.activityDate
-                      }
-                    >
-                      {activity.date}
-                    </Text>
-                  </View>
-
-                  <Ionicons
-                    name="chevron-forward"
-                    size={20}
-                    color="#8290A2"
-                  />
-                </Pressable>
-
-                {index <
-                  recentActivity.length -
-                    1 && (
-                  <View
-                    style={styles.divider}
-                  />
-                )}
-              </View>
-            )
-          )}
-        </View>
-
-        {/* Keeps content above bottom navigation */}
-        <View style={styles.scrollSpacer} />
-      </ScrollView>
-
-      {/* BOTTOM NAVIGATION */}
-      <View style={styles.bottomNav}>
-        <NavItem
-          icon="home"
-          label="Home"
-          active
-          onPress={() => {}}
-        />
-
-        <NavItem
-          icon="cube-outline"
-          label="Assets"
-          onPress={() =>
-            comingSoon("Assets")
-          }
-        />
-
-        <NavItem
-          icon="camera-outline"
-          label="Scan"
-          onPress={() =>
-            comingSoon("Scan")
-          }
-        />
-
-        <NavItem
-          icon="clipboard-outline"
-          label="Inspections"
-          onPress={() =>
-            comingSoon("Inspections")
-          }
-        />
-
-        <NavItem
-          icon="ellipsis-horizontal"
-          label="More"
-          onPress={() =>
-            comingSoon("More")
-          }
-        />
       </View>
-    </SafeAreaView>
-  );
+      <Text style={styles.greeting}>{greeting}</Text>
+      <Text style={styles.name}>{displayName}</Text>
+      {data?.workspace && <Text style={styles.company}>{data.workspace.name}</Text>}
+      <View style={{ height: 20 }} />
+      <LoadState loading={loading && !data} error={error} retry={() => void reload()} />
+      {!loading && data && !data.workspace && <View style={ui.card}>
+        <Text style={ui.heading}>Your workspace starts here</Text>
+        <Text style={ui.body}>Add your organization and first site to keep your equipment records together.</Text>
+        <Action label="Set up workspace" onPress={() => router.push('/workspace')} />
+      </View>}
+      {hasWorkspace && <Action label="Add equipment" onPress={() => router.push('/assets/new')} />}
+      <View style={styles.scanCard}>
+        <Ionicons name="camera-outline" size={30} color={colors.muted} />
+        <View style={{ flex: 1 }}><Text style={ui.heading}>Scan Equipment</Text><Text style={styles.planned}>Planned</Text></View>
+      </View>
+      <View style={styles.metrics}>
+        <Metric icon="cube-outline" label="Assets" value={data && !loading ? String(data.assetCount) : '—'}
+          onPress={hasWorkspace ? () => router.push('/assets') : undefined} />
+        <Metric icon="clipboard-outline" label="Inspections" value="Planned" />
+        <Metric icon="construct-outline" label="Work Orders" value="Planned" />
+        <Metric icon="camera-outline" label="Scans" value="Planned" />
+      </View>
+      <Text style={styles.sectionTitle}>Recent Activity</Text>
+      {!loading && data && data.recentActivity.length === 0 && <View style={ui.card}>
+        <Text style={ui.body}>No activity yet. Saved equipment records will appear here.</Text>
+      </View>}
+      {!loading && data?.recentActivity.map(activity => <Pressable key={activity.id} accessibilityRole="button" style={styles.activity}
+        onPress={() => router.push({ pathname: '/assets/[id]', params: { id: activity.asset.id } })}>
+        <View style={styles.activityIcon}><Ionicons name="cube-outline" size={24} color={colors.blue} /></View>
+        <View style={{ flex: 1 }}>
+          <Text style={ui.heading}>{activity.asset.assetTag}</Text>
+          <Text style={styles.activityText}>{activity.action === 'ASSET_CREATED' ? 'Asset added' : 'Asset updated'} · {activity.asset.name}</Text>
+          <Text style={styles.activityDate}>{new Date(activity.createdAt).toLocaleString()}</Text>
+        </View>
+        <Ionicons name="chevron-forward" size={20} color={colors.muted} />
+      </Pressable>)}
+    </ScrollView>
+    <View style={styles.bottomNav}>
+      <Pressable accessibilityRole="button" accessibilityState={{ selected: true }} accessibilityLabel="Home" style={styles.nav} onPress={() => void reload()}>
+        <Ionicons name="home" size={23} color={colors.blue} /><Text style={[styles.navLabel, { color: colors.blue }]}>Home</Text>
+      </Pressable>
+      <Pressable accessibilityRole="button" accessibilityState={{ disabled: !hasWorkspace }} disabled={!hasWorkspace} style={styles.nav} onPress={() => router.push('/assets')}>
+        <Ionicons name="cube-outline" size={23} color={colors.muted} /><Text style={styles.navLabel}>Assets</Text>
+      </Pressable>
+      <View style={styles.nav} accessibilityLabel="Scan, planned"><Ionicons name="camera-outline" size={23} color="#576575" /><Text style={styles.navLabel}>Scan · Soon</Text></View>
+      <View style={styles.nav} accessibilityLabel="Inspections, planned"><Ionicons name="clipboard-outline" size={23} color="#576575" /><Text style={styles.navLabel}>Inspections · Soon</Text></View>
+      <Pressable accessibilityRole="button" disabled={signingOut} style={styles.nav} onPress={account}><Ionicons name="person-circle-outline" size={23} color={colors.muted} /><Text style={styles.navLabel}>Account</Text></Pressable>
+    </View>
+  </SafeAreaView>;
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#080D12",
-  },
-
-  content: {
-    paddingHorizontal: 18,
-    paddingTop: 8,
-  },
-
-  /*
-    Header
-  */
-
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginBottom: 32,
-  },
-
-  logo: {
-    color: "#FFFFFF",
-    fontSize: 28,
-    fontWeight: "900",
-    letterSpacing: -1,
-  },
-
-  logoAccent: {
-    color: "#278CFF",
-  },
-
-  avatar: {
-    width: 46,
-    height: 46,
-    borderRadius: 23,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#334155",
-  },
-
-  avatarText: {
-    color: "#FFFFFF",
-    fontSize: 16,
-    fontWeight: "700",
-  },
-
-  /*
-    Welcome section
-  */
-
-  welcome: {
-    marginBottom: 22,
-  },
-
-  greeting: {
-    color: "#A7B0BC",
-    fontSize: 17,
-    marginBottom: 1,
-  },
-
-  name: {
-    color: "#FFFFFF",
-    fontSize: 34,
-    fontWeight: "900",
-    lineHeight: 39,
-  },
-
-  company: {
-    color: "#B5BFCC",
-    fontSize: 17,
-    marginTop: 1,
-  },
-
-  /*
-    Scan equipment button
-  */
-
-  scanButton: {
-    minHeight: 92,
-    borderRadius: 18,
-    backgroundColor: "#1484F6",
-
-    flexDirection: "row",
-    alignItems: "center",
-
-    paddingHorizontal: 18,
-    marginBottom: 18,
-  },
-
-  scanIcon: {
-    width: 54,
-    height: 54,
-
-    borderRadius: 14,
-
-    alignItems: "center",
-    justifyContent: "center",
-
-    backgroundColor:
-      "rgba(255,255,255,0.13)",
-
-    marginRight: 15,
-  },
-
-  scanText: {
-    flex: 1,
-
-    color: "#FFFFFF",
-
-    fontSize: 20,
-    fontWeight: "800",
-  },
-
-  /*
-    Dashboard metric cards
-  */
-
-  metricsGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-
-    justifyContent: "space-between",
-
-    rowGap: 11,
-
-    marginBottom: 30,
-  },
-
-  metricCard: {
-    width: "48.3%",
-
-    minHeight: 102,
-
-    padding: 13,
-
-    borderRadius: 16,
-
-    borderWidth: 1,
-    borderColor: "#1C2936",
-
-    backgroundColor: "#111922",
-
-    flexDirection: "row",
-    alignItems: "center",
-
-    marginBottom: 11,
-  },
-
-  metricIcon: {
-    width: 43,
-    height: 43,
-
-    borderRadius: 13,
-
-    backgroundColor: "#1D2936",
-
-    alignItems: "center",
-    justifyContent: "center",
-
-    marginRight: 10,
-  },
-
-  metricText: {
-    flex: 1,
-  },
-
-  metricLabel: {
-    color: "#AFB9C5",
-
-    fontSize: 12,
-    fontWeight: "600",
-  },
-
-  metricValue: {
-    fontSize: 22,
-    fontWeight: "900",
-
-    marginTop: 3,
-  },
-
-  /*
-    Recent activity
-  */
-
-  sectionHeader: {
-    flexDirection: "row",
-
-    justifyContent: "space-between",
-    alignItems: "center",
-
-    marginBottom: 12,
-  },
-
-  sectionTitle: {
-    color: "#FFFFFF",
-
-    fontSize: 21,
-    fontWeight: "900",
-  },
-
-  viewAll: {
-    color: "#278CFF",
-
-    fontSize: 14,
-    fontWeight: "700",
-  },
-
-  activityCard: {
-    backgroundColor: "#0F171F",
-
-    borderWidth: 1,
-    borderColor: "#1C2936",
-
-    borderRadius: 16,
-
-    overflow: "hidden",
-  },
-
-  activityRow: {
-    minHeight: 91,
-
-    paddingHorizontal: 14,
-    paddingVertical: 13,
-
-    flexDirection: "row",
-    alignItems: "center",
-  },
-
-  activityIcon: {
-    width: 53,
-    height: 53,
-
-    borderRadius: 13,
-
-    backgroundColor: "#1D2936",
-
-    alignItems: "center",
-    justifyContent: "center",
-
-    marginRight: 13,
-  },
-
-  activityInfo: {
-    flex: 1,
-  },
-
-  activityAsset: {
-    color: "#FFFFFF",
-
-    fontSize: 16,
-    fontWeight: "800",
-  },
-
-  activityDescription: {
-    color: "#AFB8C5",
-
-    fontSize: 14,
-
-    marginTop: 3,
-  },
-
-  activityDate: {
-    color: "#788493",
-
-    fontSize: 12,
-
-    marginTop: 3,
-  },
-
-  divider: {
-    height: 1,
-
-    backgroundColor: "#1D2936",
-
-    marginLeft: 80,
-  },
-
-  scrollSpacer: {
-    height: 105,
-  },
-
-  /*
-    Bottom navigation
-  */
-
-  bottomNav: {
-    position: "absolute",
-
-    bottom: 0,
-    left: 0,
-    right: 0,
-
-    height: 80,
-
-    paddingBottom: 7,
-
-    backgroundColor: "#0B1118",
-
-    borderTopWidth: 1,
-    borderTopColor: "#1D2936",
-
-    flexDirection: "row",
-    alignItems: "center",
-  },
-
-  navItem: {
-    flex: 1,
-
-    alignItems: "center",
-    justifyContent: "center",
-  },
-
-  navLabel: {
-    color: "#8B97A8",
-
-    fontSize: 10,
-    fontWeight: "600",
-
-    marginTop: 4,
-  },
-
-  navLabelActive: {
-    color: "#278CFF",
-  },
-
-  pressed: {
-    opacity: 0.7,
-  },
+  container: { flex: 1, backgroundColor: colors.background },
+  content: { padding: 18, paddingBottom: 28 },
+  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 32 },
+  logo: { color: colors.text, fontSize: 28, fontWeight: '900', letterSpacing: -1 },
+  avatar: { width: 46, height: 46, borderRadius: 23, alignItems: 'center', justifyContent: 'center', backgroundColor: '#334155' },
+  avatarText: { color: colors.text, fontWeight: '700', fontSize: 16 },
+  greeting: { color: colors.muted, fontSize: 17 },
+  name: { color: colors.text, fontSize: 32, fontWeight: '900' },
+  company: { color: colors.muted, fontSize: 17, marginTop: 4 },
+  scanCard: { flexDirection: 'row', alignItems: 'center', gap: 16, backgroundColor: '#152234', borderRadius: 18, padding: 18, marginVertical: 18 },
+  planned: { color: colors.muted, fontSize: 13 },
+  metrics: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', gap: 12, marginBottom: 28 },
+  metric: { width: '48%', minHeight: 122, padding: 16, backgroundColor: colors.card, borderColor: colors.border, borderWidth: 1, borderRadius: 16 },
+  metricLabel: { color: colors.muted, fontSize: 13, marginTop: 10 },
+  metricValue: { color: colors.text, fontSize: 22, fontWeight: '800', marginTop: 4 },
+  sectionTitle: { color: colors.text, fontSize: 21, fontWeight: '800', marginBottom: 14 },
+  activity: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 14, marginBottom: 10, borderRadius: 16, backgroundColor: colors.card },
+  activityIcon: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center', borderRadius: 12, backgroundColor: '#1D2936' },
+  activityText: { color: colors.muted, fontSize: 14 },
+  activityDate: { color: '#8B97A8', fontSize: 12, marginTop: 6 },
+  bottomNav: { flexDirection: 'row', borderTopWidth: 1, borderColor: colors.border, backgroundColor: '#0B1118', paddingVertical: 12 },
+  nav: { flex: 1, minHeight: 48, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 2 },
+  navLabel: { color: colors.muted, fontSize: 10, textAlign: 'center', marginTop: 4 },
 });

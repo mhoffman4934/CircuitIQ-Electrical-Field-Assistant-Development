@@ -1,0 +1,80 @@
+generator client {
+  provider = "prisma-client"
+  output = "../src/generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  firebaseUid String @id
+  membership Membership?
+  activities Activity[]
+  createdAt DateTime @default(now())
+}
+
+model Organization {
+  id String @id @default(uuid()) @db.Uuid
+  name String @db.VarChar(120)
+  members Membership[]
+  sites Site[]
+  assets Asset[]
+  activities Activity[]
+  createdAt DateTime @default(now())
+}
+
+// One organization per account in this first slice. Memberships are assigned
+// by the server; clients cannot submit organization IDs to gain access.
+model Membership {
+  userId String @id
+  user User @relation(fields: [userId], references: [firebaseUid], onDelete: Restrict)
+  organizationId String @db.Uuid
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  @@index([organizationId])
+}
+
+model Site {
+  id String @id @default(uuid()) @db.Uuid
+  name String @db.VarChar(120)
+  organizationId String @db.Uuid
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  assets Asset[]
+  createdAt DateTime @default(now())
+  @@unique([id, organizationId])
+  @@index([organizationId])
+}
+
+model Asset {
+  id String @id @default(uuid()) @db.Uuid
+  assetTag String @db.VarChar(80)
+  name String @db.VarChar(120)
+  manufacturer String? @db.VarChar(120)
+  model String? @db.VarChar(120)
+  serialNumber String? @db.VarChar(120)
+  notes String? @db.VarChar(2000)
+  organizationId String @db.Uuid
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  siteId String @db.Uuid
+  site Site @relation(fields: [siteId, organizationId], references: [id, organizationId], onDelete: Restrict)
+  activities Activity[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@unique([organizationId, assetTag])
+  @@unique([id, organizationId])
+  @@index([organizationId, createdAt, id])
+}
+
+model Activity {
+  id String @id @default(uuid()) @db.Uuid
+  organizationId String @db.Uuid
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  assetId String @db.Uuid
+  asset Asset @relation(fields: [assetId, organizationId], references: [id, organizationId], onDelete: Restrict)
+  actorId String
+  actor User @relation(fields: [actorId], references: [firebaseUid], onDelete: Restrict)
+  action String @db.VarChar(40)
+  createdAt DateTime @default(now())
+  @@index([organizationId, createdAt, id])
+}

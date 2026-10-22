@@ -60,24 +60,18 @@ CircuitIQ uses a Pixel 7 Android Virtual Device running Android 17 as its primar
 
 Versions recorded here establish the baseline for future CircuitIQ version audits.
 
-## In-Progress 
+## Backend Foundation — Unreleased
 
-1. Finish dashboard design
-2. Build asset list/details UI
-3. Define asset + product-model data fields
-4. Set up NestJS
-5. Set up PostgreSQL + Prisma
-6. Connect real asset data
-7. Build scanning workflow
-8. Add inspections
-9. Add work orders
+| Component | Version / status |
+|---|---|
+| NestJS | 12.2.0 |
+| Prisma Client / CLI / PostgreSQL adapter | 7.10.1 |
+| Firebase Admin SDK | 14.5.0 |
+| PostgreSQL development container | 17 |
+| Server Node.js requirement | 24+ |
+| Server package | 0.3.0; unreleased foundation |
 
-React Native / Expo
-        ↓
-Firebase Authentication
-        ↓
-NestJS API
-        ↓
-Prisma
-        ↓
-PostgreSQL
+Implemented: workspace setup, authenticated organization-scoped asset create/list/detail, and dashboard asset totals/activity. Database schema and migrations are versioned in `server/prisma/`.
+
+Next: local Firebase/PostgreSQL configuration and Pixel 7 smoke test; inspections and Last Inspection Date; work orders; scan/OCR/review/confirm; team invitations and roles. Product-model hazard data remains a future feature. No SQLite/offline persistence is added.
+

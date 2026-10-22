@@ -16,6 +16,8 @@ CircuitIQ is being developed to support electrical asset identification, equipme
 
 ## Technology
 
+**Dashboard/backend foundation (unreleased):** workspace setup, asset creation/search/details, authenticated NestJS endpoints, Prisma migrations, and PostgreSQL storage are implemented on the backend feature branch. See [server/README.md](server/README.md) for the complete local setup and device smoke test. Scanning, inspections, and work orders remain planned.
+
 - React Native 0.86
 - Expo SDK 57
 - React
@@ -24,6 +26,9 @@ CircuitIQ is being developed to support electrical asset identification, equipme
 - Git
 - GitHub
 - Firebase
+- NestJS API
+- Prisma ORM
+- PostgreSQL
 - Unsplash
 
 ## Development Environment
@@ -305,3 +310,4 @@ npx expo start
 ## Project Status
 
 CircuitIQ is currently under active development.
+

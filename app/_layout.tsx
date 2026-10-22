@@ -1,4 +1,5 @@
 import { Stack } from "expo-router";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 import {
   ActivityIndicator,
   View,
@@ -39,6 +40,10 @@ function RootNavigator() {
 
       <Stack.Protected guard={!!user}>
         <Stack.Screen name="dashboard" />
+        <Stack.Screen name="workspace" />
+        <Stack.Screen name="assets/index" />
+        <Stack.Screen name="assets/new" />
+        <Stack.Screen name="assets/[id]" />
       </Stack.Protected>
     </Stack>
   );
@@ -46,8 +51,10 @@ function RootNavigator() {
 
 export default function RootLayout() {
   return (
-    <AuthProvider>
-      <RootNavigator />
-    </AuthProvider>
+    <SafeAreaProvider>
+      <AuthProvider>
+        <RootNavigator />
+      </AuthProvider>
+    </SafeAreaProvider>
   );
 }

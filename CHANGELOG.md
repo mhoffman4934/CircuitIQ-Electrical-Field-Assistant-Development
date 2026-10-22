@@ -2,6 +2,29 @@
 
 All notable changes to CircuitIQ will be documented in this file.
 
+## [Unreleased] - Dashboard Backend Foundation
+
+### Added
+
+- Separate NestJS API in `server/` with Firebase Admin token verification.
+- Prisma schema and SQL migration for users, organizations, memberships, sites, assets, and activity.
+- Server-enforced organization scoping, composite foreign keys, validated inputs, unique asset tags, and transactional asset/activity writes.
+- Workspace setup and protected asset create, search, list, and detail screens.
+- Live dashboard asset counts and recent activity with loading, empty, error, retry, and pull-to-refresh states.
+- PostgreSQL development Compose configuration and setup guide.
+- Lint configuration, auth/validation unit tests, and PostgreSQL integration tests.
+
+### Changed
+
+- Dashboard uses Firebase account details instead of placeholder names.
+- Unimplemented scan, inspection, and work-order features are marked as planned.
+- Server code is excluded from the mobile TypeScript and lint projects.
+
+### Remaining
+
+- Configure the local Firebase Admin credentials and PostgreSQL instance, then smoke-test on Pixel 7.
+- Inspection, work-order, scan/OCR, invitation/role, and deployment workflows.
+
 ## [0.2.0] - Authentication Foundation
 
 ### Added
@@ -60,3 +83,4 @@ All notable changes to CircuitIQ will be documented in this file.
 - Reusable project structure for future features
 - Git and GitHub version-control workflow
 - Repository documentation structure
+
