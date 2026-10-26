@@ -27,6 +27,9 @@ CircuitIQ is being developed to support electrical asset identification, equipme
 - GitHub
 - Firebase
 - Unsplash
+- NestJS
+- Prisma
+- PostgreSQL
 
 ## Development Environment
 
