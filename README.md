@@ -1,5 +1,4 @@
 
-````markdown
 # CircuitIQ
 
 CircuitIQ is a mobile electrical field assistant being developed for electricians, technicians, engineers, and field-service professionals.
