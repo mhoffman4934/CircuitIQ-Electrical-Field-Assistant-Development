@@ -1,321 +1,427 @@
+
+````markdown
 # CircuitIQ
 
-CircuitIQ is an AI-powered electrical field intelligence platform designed for electricians, technicians, engineers, and field-service professionals.
+CircuitIQ is a mobile electrical field assistant being developed for electricians, technicians, engineers, and field-service professionals.
+
+The project combines a React Native mobile application with Firebase Authentication and a NestJS backend using Prisma and PostgreSQL. Planned capabilities include equipment identification, asset management, inspections, work orders, and AI-assisted information extraction.
+
+**Status:** Active development. Authentication and the backend foundation are implemented; company authorization and mobile-to-backend integration are next.
 
 ## Project Goal
 
-CircuitIQ is being developed to support electrical asset identification, equipment scanning, field inspections, technical information retrieval, and AI-assisted electrical workflows. CircuitIQ aims to make electrical fieldwork more efficient, manageable, and organized than current market products. 
+CircuitIQ aims to bring electrical equipment information and field workflows into one organized workspace.
 
-## Current Milestone
+The planned equipment-scanning workflow is:
 
-**v0.1.0 - Mobile Foundation & Electrical Field Prototype**
+**Scan → OCR → Review → Confirm**
 
-**v0.1.0 - Trial Interface Iterations -(9/24/2026)**
+Users will review and confirm extracted information before it becomes approved asset data. AI-generated results will support the technician's work rather than automatically establish verified equipment information.
 
-**v0.2.0 - Login Authentication using Firebase and Signout Component (10/4/2026)**
+## Development Progress
 
-**v0.3.0 - Currently in progress with dashboard UI and app design direction (10/6/2026)**
+| Area | Current Progress |
+|---|---|
+| Mobile foundation | React Native, Expo, TypeScript, and Expo Router configured |
+| Authentication | Firebase email/password login, persistent sessions, protected routes, and sign-out |
+| Dashboard | Interface built with metric cards, recent activity, and navigation placeholders |
+| Backend | NestJS application with health and database-readiness endpoints |
+| Database | PostgreSQL development database running through Docker Compose |
+| Prisma | Schema, generated client integration, and initial Organization migration |
+| Documentation | Changelog, version registry, and editable backend class diagram |
+| Integration | Mobile dashboard is not yet connected to the backend |
+
+### Branch Availability
+
+- **`main`** contains the merged mobile and authentication foundation.
+- **`feature/backend-foundation`** contains the dashboard interface and NestJS–Prisma–PostgreSQL foundation.
+
+The backend setup instructions below require the backend foundation branch.
+
+Dashboard counts and activity entries are currently placeholders. Most dashboard actions display a message indicating that the feature is not yet implemented.
 
 ## Technology
 
-- React Native 0.86
-- Expo SDK 57
-- React
-- TypeScript
-- Android
-- Git
-- GitHub
-- Firebase
-- Unsplash
-- NestJS
-- Prisma
-- PostgreSQL
-- Docker
+| Technology | Role |
+|---|---|
+| React Native | Mobile application framework |
+| Expo | Mobile development tooling and application configuration |
+| React | Component-based user interface |
+| TypeScript | Static typing across mobile and backend code |
+| Expo Router | Screen navigation and protected routes |
+| Firebase Authentication | Email/password authentication and session management |
+| NestJS | Backend API structure and application logic |
+| Prisma | Database access and schema migrations |
+| PostgreSQL | Relational application database |
+| Docker Compose | Local PostgreSQL environment |
+| Vitest | Backend automated testing |
+| Git and GitHub | Version control, branches, and development history |
+
+Dependency declarations and lockfiles are maintained separately for the mobile application and backend.
+
+See [VERSIONS.md](VERSIONS.md) for the recorded development environment and [CHANGELOG.md](CHANGELOG.md) for implementation history.
 
 ## Development Environment
 
-Primary editor:
+| Tool | Configuration |
+|---|---|
+| Primary editor | Cursor |
+| Mobile development tools | Android Studio, Android SDK, and ADB |
+| Primary test device | Pixel 7 Android Virtual Device |
+| Android environment | Android 17 |
+| JavaScript runtime | Node.js 24 |
+| Local database environment | Docker Desktop and PostgreSQL 17 |
 
-**Cursor**
+## Application Architecture
 
-Primary mobile development target:
+### Mobile Application
 
-**Pixel 7 Android Virtual Device**
+The mobile application handles:
 
-Runtime:
+- Login form validation and authentication feedback.
+- Firebase sign-in and sign-out.
+- Authentication state through `AuthContext`.
+- Persistent authentication sessions.
+- Protected navigation through Expo Router.
+- Dashboard presentation and user interaction.
 
-**Android 17**
+### Backend
 
-## Security
+The backend currently contains five application classes:
 
-Secrets, API keys, credentials, and private environment variables must never be committed to this repository.
+| Class | Responsibility |
+|---|---|
+| `AppModule` | Registers application modules, providers, and the controller |
+| `AppController` | Defines the HTTP endpoints |
+| `AppService` | Implements starter, health, and readiness responses |
+| `PrismaModule` | Provides and exports the shared database service |
+| `PrismaService` | Extends Prisma Client and handles connection initialization and cleanup |
 
-## Development Practice and Architecture
+A database-readiness request follows this path:
 
-CircuitIQ aims to demonstrate practical software engineering concepts beyond basic mobile UI development.
+**HTTP request → AppController → AppService → PrismaService → PostgreSQL**
 
-### Mobile Application Development
+The mobile application does not yet send authenticated requests to this backend.
 
-- React Native application development
-- Expo project configuration
-- TypeScript-based development
-- Android-focused development and testing
-- Pixel 7 Android Virtual Device testing
-- Component-based UI architecture
-- Mobile navigation and screen organization
-- Reusable UI components
-- Centralized design system and theme management
+### Database
 
-### Software Engineering
+The initial `Organization` model represents a company using CircuitIQ.
 
-- Modular project organization
-- Separation of concerns
-- Reusable TypeScript types and interfaces
-- Domain-driven modeling of electrical assets
-- Incremental feature development through sprints
-- Versioned software releases
-- Architecture documentation
-- UML modeling
-- Maintainable and extensible code structure
+| Field | Purpose |
+|---|---|
+| `id` | Unique organization identifier |
+| `name` | Company name |
+| `createdAt` | Creation timestamp |
+| `updatedAt` | Timestamp maintained by Prisma when a record is updated |
 
-### Git & GitHub
+Employee memberships, roles, assets, inspections, and work orders will be added through future schema changes.
 
-- Local version control using Git
-- Remote repository hosting using GitHub
-- Incremental development history
-- Repository hygiene
+## Backend Endpoints
 
-### Security & Configuration
+These endpoints are available on the backend foundation branch:
 
-- Environment-variable management
-- Separation of secrets from source code
-- `.gitignore` configuration
-- `.env` for private local configuration
-- `.env.example` for documented configuration requirements
-- Prevention of API keys and credentials from entering version control
+| Method | Route | Purpose |
+|---|---|---|
+| GET | `/` | Returns the starter message |
+| GET | `/health` | Confirms the running API responds |
+| GET | `/ready` | Queries the Organization table to check database access |
 
-### Android Development Tooling
+Successful health response:
 
-- Android Studio
-- Android SDK
-- Android Virtual Devices
-- Android Debug Bridge (ADB)
-- Emulator-based application testing
-- Metro development server
-- Expo Go development workflow
+```json
+{
+  "status": "ok",
+  "service": "CircuitIQ API"
+}
+```
 
-### Electrical Domain Modeling
+Successful readiness response:
 
-- Electrical asset representation
-- Equipment-type classification
-- Equipment status modeling
-- Structured electrical specifications
-- Asset detail workflows
-- Electrical equipment scan workflow design
-- Human verification of AI-generated information
+```json
+{
+  "status": "ok",
+  "database": "connected"
+}
+```
 
-### Future Work -- AI-Oriented Architecture 
+A failed readiness query returns HTTP 503. An empty Organization table is a valid result and does not cause readiness to fail.
 
-- Structured scan-result models
-- Confidence values
-- Human-in-the-loop verification
-- Typed data contracts
-- Separation between UI and future AI services
-- A design that allows mock scan data to later be replaced by real multimodal AI responses
+## Installation and Running
 
-## Installation & Running
+The following commands use PowerShell.
 
 ### Prerequisites
 
-Before running CircuitIQ, make sure the following are installed:
-
-- Node.js 24+
-- npm
-- Git
-- Java JDK 17
-- Android Studio
-- Android SDK
-- Android Debug Bridge (ADB)
-- Pixel 7 Android Virtual Device
+- Git.
+- Node.js 24 and npm.
+- Android Studio with the Android SDK and emulator tools.
+- Java JDK 17 for the documented Android development environment.
+- A configured Pixel 7 AVD.
+- Firebase project configuration and an enabled email/password sign-in provider.
+- An existing Firebase test account.
+- Docker Desktop when running the backend.
 
 ### 1. Clone the Repository
 
-```bash
-
-git clone [https://github.com/YOUR_USERNAME/CircuitIQ.git](https://github.com/YOUR_USERNAME/CircuitIQ.git)
-
+```powershell
+git clone https://github.com/mhoffman4934/CircuitIQ-Electrical-Field-Assistant-Development.git CircuitIQ
 cd CircuitIQ
-
 ```
 
-Replace `YOUR_USERNAME` with the GitHub username that owns the CircuitIQ repository.
+Repository access is required if the repository is private.
 
-### 2. Install Dependencies
+To work with the dashboard and backend foundation:
 
-```bash
-
-npm install
-
+```powershell
+git switch feature/backend-foundation
 ```
 
-This installs the dependencies defined in `package.json` using the versions recorded in `package-lock.json`.
+### 2. Install Mobile Dependencies
 
-### 3. Configure Environment Variables
+From the repository root:
 
-Create a local `.env` file using `.env.example` as a reference.
-
-Example:
-
-```env
-
-EXPO_PUBLIC_API_URL=
-
-AI_API_KEY=
-
-DATABASE_URL=
-
-JWT_SECRET=
-
+```powershell
+npm ci
 ```
 
-Real credentials and secret values must never be committed to Git.
+### 3. Configure Firebase
 
-### 4. Start the Pixel 7 Emulator
+For a new local setup, copy the mobile environment template:
 
-Open Android Studio and launch the primary CircuitIQ development device:
+```powershell
+Copy-Item .env.example .env
+```
 
-- Pixel 7 AVD
-- Android 17
+If `.env` already exists, update it rather than overwriting it.
 
-Verify that ADB can detect the emulator:
+Populate the variables with the Firebase configuration for your development project:
 
-```bash
+```dotenv
+EXPO_PUBLIC_FIREBASE_API_KEY=
+EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN=
+EXPO_PUBLIC_FIREBASE_PROJECT_ID=
+EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET=
+EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=
+EXPO_PUBLIC_FIREBASE_APP_ID=
+```
 
+These variables configure the Firebase client application. Values prefixed with `EXPO_PUBLIC_` are included in the client bundle and must not contain private server credentials.
+
+The mobile application currently supports sign-in with an existing account. Company-managed employee provisioning is planned.
+
+### 4. Start the Android Emulator
+
+Open Android Studio and launch the Pixel 7 AVD.
+
+Confirm that ADB detects the emulator:
+
+```powershell
 adb devices
-
 ```
 
-A successful connection should show the emulator with the status:
+The emulator should appear with the status `device`.
 
-```text
+### 5. Start the Mobile Application
 
-device
+From the repository root:
 
-```
-
-### 5. Start the Expo Development Server
-
-From the CircuitIQ project directory, run:
-
-```bash
-
+```powershell
 npm start
-
 ```
 
-or:
+Press **a** in the Expo terminal to open the application on Android.
 
-```bash
+Alternatively:
 
-npx expo start
-
+```powershell
+npm run android
 ```
 
-This starts Expo and the Metro development server.
+### 6. Set Up the Backend
 
-### 6. Run CircuitIQ on Android
+On `feature/backend-foundation`, open a second terminal and enter the server directory:
 
-With the Pixel 7 emulator running, press:
+```powershell
+cd server
+npm ci
+```
+
+For a new setup:
+
+```powershell
+Copy-Item .env.example .env
+```
+
+Configure the server environment:
+
+```dotenv
+POSTGRES_USER=circuitiq_dev
+POSTGRES_PASSWORD=replace_me
+POSTGRES_DB=circuitiq
+DATABASE_URL="postgresql://circuitiq_dev:replace_me@127.0.0.1:5432/circuitiq?schema=public"
+```
+
+Replace both password placeholders with matching values. Percent-encode special characters in the URL password when necessary.
+
+Keep the documented username and database name because the current Compose configuration uses those names.
+
+With Docker Desktop running:
+
+```powershell
+docker compose up -d
+npx prisma migrate deploy --config prisma7.config.ts
+npx prisma generate --config prisma7.config.ts
+npm run build
+npm run start:dev
+```
+
+The default API address is:
 
 ```text
-
-a
-
+http://localhost:3000
 ```
 
-inside the Expo terminal.
+Check:
 
-Alternatively, run:
+- [API health](http://localhost:3000/health)
+- [Database readiness](http://localhost:3000/ready)
 
-```bash
+The root `.env` configures the mobile application. `server/.env` configures the backend and local database.
 
-npm run android
+## Verification and Testing
 
+### Mobile TypeScript Check
+
+Run from the repository root:
+
+```powershell
+npx tsc --noEmit
 ```
 
-CircuitIQ should open on the Pixel 7 emulator through Expo Go.
+### Backend Checks
 
-### Git Development Workflow
+Run from `server`:
 
-Before beginning work:
-
-```bash
-
-git status
-
-git pull
-
+```powershell
+npm run build
+npm run lint
+npm test
+npx prisma validate --config prisma7.config.ts
 ```
 
-After completing a logical change:
+The current controller unit test verifies the starter response using a mocked Prisma service. It does not verify all API behavior or establish a real database connection.
 
-```bash
+The existing end-to-end test can be run with:
 
-git status
-
-git add .
-
-git status
-
-git commit -m "feat: describe the change"
-
-git push
-
+```powershell
+npm run test:e2e
 ```
 
-### Troubleshooting
+It initializes the real application and requires the server environment, generated Prisma Client, and a reachable PostgreSQL database.
 
-If ADB does not detect the emulator:
+During development, the backend build, starter unit test, migration, client generation, and browser health/readiness checks have been verified. Broader automated coverage and continuous integration are planned.
 
-```bash
+## Security and Configuration
 
-adb kill-server
+- Firebase handles user passwords and authentication.
+- Mobile route protection controls which screens are accessible through the app.
+- Backend Firebase token verification and organization authorization are not yet implemented.
+- Future company-data endpoints must validate identity and organization membership on the server.
+- Database credentials, service-account private keys, and other server secrets must remain outside version control and the mobile bundle.
+- Environment templates use placeholder values.
+- Generated Prisma files, dependencies, and build output are excluded from Git.
+- The local PostgreSQL port is bound to `127.0.0.1`.
 
-adb start-server
+An authenticated Firebase account will not automatically imply permission to access a company's data. That authorization will be enforced by the backend.
 
-adb devices
+## Engineering Concepts Demonstrated
 
-```
+- Component-based mobile application development.
+- TypeScript types and interfaces.
+- Authentication state management.
+- Protected application navigation.
+- Separation between controllers, application services, and database access.
+- NestJS dependency injection and lifecycle hooks.
+- Relational database modeling and schema migrations.
+- Environment-based configuration.
+- Docker-based local development.
+- Unit testing with mocked dependencies.
+- Git branching and incremental commits.
+- UML documentation and development records.
 
-If project dependencies are missing:
+## Progress Notes
 
-```bash
+CircuitIQ has helped me understand how a mobile application works beyond its interface. Building the login flow taught me how authentication state, navigation, session persistence, and error handling work together.
 
-npm install
+Developing the dashboard helped me organize reusable interface elements and distinguish presentation code from the data and workflows that will eventually support it.
 
-```
+The backend foundation introduced a second part of the application: a NestJS API connected to PostgreSQL through Prisma. Implementing the health and readiness endpoints helped me trace a request from an HTTP route through a service to a database query.
 
-If the Expo development server needs to be restarted:
+I have also practiced dependency injection, environment configuration, database migrations, Docker containers, and testing with a mocked database service.
 
-```bash
+Git and GitHub have supported this process through feature branches, incremental commits, documentation updates, and repository reviews. The next stage is connecting these foundations into an authenticated, company-aware application.
 
-npx expo start
+## Future Plans
 
-```
-## (Progress Notes)
+### 1. Complete the Backend Foundation Checkpoint
 
-CircuitIQ has helped me understand how a mobile application works beyond the user interface. Through this project, I have learned how the UI, application logic, authentication state, navigation, and project structure work together to create a functional mobile application.
+- Finalize the backend setup documentation.
+- Correct version records and documentation formatting.
+- Add tests for health and readiness success and failure responses.
+- Improve formatting consistency and repeatable development checks.
+- Review the completed branch before merging it into `main`.
 
-One of the main challenges has been integrating Firebase Authentication with React Native and Expo while maintaining persistent user sessions and protected application routes. This helped me better understand authentication state management, dependency compatibility, environment configuration, and how different parts of a mobile application communicate with each other.
+### 2. Add Users and Organization Memberships
 
- Using Git and GitHub throughout development has helped me better understand branching, merging, commits, version tracking, and maintaining a clean development history.
+- Create backend user records linked to Firebase UIDs.
+- Connect users to organizations through membership records.
+- Define initial employee roles and active-access status.
+- Continue using Firebase for password handling.
 
-As CircuitIQ continues to grow, the next major areas of development will include the dashboard, asset management, equipment scanning, inspections, work orders, and eventually a NestJS/PostgreSQL backend.
-I will continue to update this section as this project grows and comes together. 
+### 3. Verify Firebase Tokens in NestJS
+
+- Send Firebase ID tokens with mobile API requests.
+- Verify tokens on the backend.
+- Protect endpoints that require an authenticated user.
+
+### 4. Enforce Company-Managed Access
+
+- Require an active organization membership before returning company data.
+- Enforce role-based permissions where needed.
+- Provision a development organization and employee for initial testing.
+- Add an administrator-managed invitation and access workflow later.
+
+### 5. Connect the First Authenticated Mobile Feature
+
+- Create a protected `GET /me` endpoint.
+- Return the employee's profile, organization, and role.
+- Connect the mobile application to the endpoint.
+- Replace dashboard name and company placeholders with backend data.
+
+### 6. Implement Company-Owned Assets
+
+- Add the Asset model and organization relationship.
+- Create endpoints for listing, viewing, and creating assets.
+- Enforce organization access on every asset operation.
+- Replace the dashboard's asset count with a real database result.
+
+### 7. Build Field Workflows
+
+- Add inspections and work orders.
+- Connect dashboard summaries and recent activity to backend data.
+- Implement equipment scanning and OCR.
+- Present extracted information for user review and correction.
+- Save approved information after explicit confirmation.
+
+The intended workflow remains:
+
+**Scan → OCR → Review → Confirm**
 
 ---
 
 ## YouTube
+
+-Project updates and development progress are posted on Youtube:
 
 - [Marcin Hoffman — Computer Science YouTube Channel](https://www.youtube.com/@MarcinHoffman-CS)
 
@@ -326,11 +432,4 @@ I will continue to update this section as this project grows and comes together.
 Project updates and development progress are also posted on LinkedIn:
 
 - [Marcin Hoffman — LinkedIn](https://www.linkedin.com/in/marcin-hoffman-935423282/)
-
----
-
-
-## Project Status
-
-CircuitIQ is currently under active development.
-
+````
