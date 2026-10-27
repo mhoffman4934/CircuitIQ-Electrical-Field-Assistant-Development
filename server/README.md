@@ -1,132 +1,341 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# CircuitIQ Backend
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+The NestJS API for CircuitIQ, an electrical field assistant built with React Native and Expo.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+This backend currently provides API health checks and a PostgreSQL database foundation. Firebase token verification, company memberships, and field-work APIs are planned next.
 
-## Description
+## Technology
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+| Component | Purpose |
+|---|---|
+| NestJS | Organizes HTTP endpoints, application logic, and dependency injection |
+| TypeScript | Provides static typing for backend code |
+| PostgreSQL 17 | Stores application data |
+| Prisma 7 | Provides database query methods and schema migrations |
+| Docker Compose | Runs the local PostgreSQL database |
+| Vitest | Runs automated tests |
 
-## Project setup
+Exact dependency versions are recorded in `package-lock.json`. The repository's `VERSIONS.md` contains additional environment information.
 
-```bash
-$ npm install
+## Current Features
+
+- `GET /` starter endpoint.
+- `GET /health` API health endpoint.
+- `GET /ready` database readiness endpoint.
+- Local PostgreSQL container with persistent storage.
+- Organization database model and initial migration.
+- Shared Prisma service with connection lifecycle handling.
+- Environment-variable configuration.
+- Starter controller unit test with a mocked database service.
+
+## Project Structure
+
+```text
+server/
+├── prisma/
+│   ├── migrations/
+│   └── schema.prisma
+├── src/
+│   ├── prisma/
+│   │   ├── prisma.module.ts
+│   │   └── prisma.service.ts
+│   ├── app.controller.spec.ts
+│   ├── app.controller.ts
+│   ├── app.module.ts
+│   ├── app.service.ts
+│   └── main.ts
+├── test/
+│   └── app.e2e-spec.ts
+├── .env.example
+├── compose.yaml
+├── package.json
+├── package-lock.json
+├── prisma7.config.ts
+├── vitest.config.ts
+└── vitest.config.e2e.ts
 ```
 
-## Compile and run the project
+Prisma Client is generated into `src/generated/prisma/`. Generated files are excluded from Git.
 
-```bash
-# development
-$ npm run start
+## Prerequisites
 
-# watch mode
-$ npm run start:dev
+- Node.js 24 and npm.
+- Docker Desktop with Linux containers available.
+- A local copy of the CircuitIQ repository.
+- Port `3000` available for the API.
+- Port `5432` available for PostgreSQL.
 
-# production mode
-$ npm run start:prod
+The following commands use PowerShell and should be run from the `server` directory.
+
+From the repository root:
+
+```powershell
+cd server
 ```
 
-## Run tests
+## Local Setup
 
-```bash
-# unit tests
-$ npm run test
+### 1. Install dependencies
 
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+```powershell
+npm ci
 ```
 
-## Deployment
+This installs the dependency versions recorded in the server lockfile.
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+### 2. Configure environment variables
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+For the initial setup, create the server's local environment file:
 
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+```powershell
+Copy-Item .env.example .env
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+If `.env` already exists, keep it and check its settings instead of overwriting it.
 
-## Observability
+The file should contain:
 
-In production applications, observability is essential for understanding how your system behaves, detecting issues early, and maintaining reliable performance.
-
-[NestJS Observe](https://observe.nestjs.com) automatically instruments your NestJS application, giving you deep visibility into your system with minimal setup:
-
-- **Distributed tracing:** Follow requests across services and understand how they flow through your system.
-- **Waterfall analysis:** Visualize request execution and identify slow operations, bottlenecks, and unexpected delays.
-- **Performance analysis:** Analyze application performance in real time and quickly pinpoint areas that need optimization.
-- **Metrics:** Track key application and infrastructure metrics to understand system health and performance trends.
-- **Logging:** Centralize and correlate logs with traces and other telemetry to make debugging easier.
-- **Error tracking:** Detect errors quickly and investigate their root causes with the surrounding context.
-- **SLA monitoring:** Track service-level objectives and identify when your application is approaching or exceeding defined thresholds.
-- **Alarms and alerts:** Set up alerts for critical errors, performance degradation, SLA violations, and other anomalies so your team can react quickly.
-
-To add it to this project, run this and approve the code it prints at [observe.nestjs.com/link](https://observe.nestjs.com/link) - signing up for free if you have no account:
-
-```bash
-$ npx @nestjs/observe link
+```dotenv
+POSTGRES_USER=circuitiq_dev
+POSTGRES_PASSWORD=replace_me
+POSTGRES_DB=circuitiq
+DATABASE_URL="postgresql://circuitiq_dev:replace_me@127.0.0.1:5432/circuitiq?schema=public"
 ```
 
-It installs `@nestjs/observe`, wires it into `AppModule` and `main.ts`, and writes the app key and secret into `.env`, which every `nest start` script (`start`, `start:dev`, `start:debug`) then loads. In production, set `OBSERVE_APP_KEY` and `OBSERVE_APP_SECRET` in the environment instead.
+Replace both occurrences of `replace_me` with the same local database password.
 
-Or do it by hand:
+If the password contains characters with special meaning in a URL, percent-encode them in `DATABASE_URL`. Keep the original password in `POSTGRES_PASSWORD`.
 
-```bash
-$ npm install @nestjs/observe
+Keep `POSTGRES_USER` and `POSTGRES_DB` set to the values above because the current Compose configuration uses those names.
+
+The backend uses `server/.env`. The mobile application's Firebase configuration belongs in the separate environment file at the repository root.
+
+Do not commit actual credentials.
+
+### 3. Start PostgreSQL
+
+Make sure Docker Desktop is running, then execute:
+
+```powershell
+docker compose up -d
 ```
 
-Then follow the [setup guide](https://docs.nestjs.com/observability/sdk) - it takes a single import and an app key.
+Check the container:
 
-The free plan needs no payment details and covers 300,000 events a month. You can also browse the [live demo](https://www.observe-demo.nestjs.com/dashboard) first - the whole dashboard over a busy service's data, with nothing to install.
+```powershell
+docker compose ps
+```
 
-## Resources
+PostgreSQL should be running and become healthy.
 
-Check out a few resources that may come in handy when working with NestJS:
+### 4. Apply database migrations
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Auto-instrument your application with [NestJS Observe](https://observe.nestjs.com). Distributed tracing, metrics, and logging made easy. Error tracking and performance monitoring for your NestJS applications.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+```powershell
+npx prisma migrate deploy --config prisma7.config.ts
+```
 
-## Support
+This applies the committed migrations, including the initial Organization table.
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+### 5. Generate Prisma Client
 
-## Stay in touch
+```powershell
+npx prisma generate --config prisma7.config.ts
+```
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+Generate the client before building the backend and after changing the Prisma schema.
 
-## License
+### 6. Build and start the API
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+```powershell
+npm run build
+```
+
+```powershell
+npm run start:dev
+```
+
+The development server watches for source-code changes.
+
+The default API address is:
+
+```text
+http://localhost:3000
+```
+
+The API port can be changed by setting `PORT` in the server environment.
+
+## API Endpoints
+
+| Method | Route | Purpose |
+|---|---|---|
+| GET | `/` | Returns the starter message |
+| GET | `/health` | Confirms the running API can respond |
+| GET | `/ready` | Checks database access by querying the Organization table |
+
+
+### GET /health
+
+Successful response: HTTP 200.
+
+```json
+{
+  "status": "ok",
+  "service": "CircuitIQ API"
+}
+```
+
+This endpoint does not perform a database query.
+
+### GET /ready
+
+Successful response: HTTP 200.
+
+```json
+{
+  "status": "ok",
+  "database": "connected"
+}
+```
+
+If the database query fails, the running API returns HTTP 503:
+
+```json
+{
+  "status": "error",
+  "database": "disconnected"
+}
+```
+
+An empty Organization table is valid. The readiness check does not create or modify records.
+
+The application also attempts to connect to PostgreSQL during startup. A startup connection failure can prevent the API from becoming available.
+
+## Backend Classes
+
+| Class | Responsibility |
+|---|---|
+| `AppModule` | Registers the controller, application service, configuration, and Prisma module |
+| `AppController` | Defines the HTTP routes and delegates requests to `AppService` |
+| `AppService` | Implements the starter, health, and readiness responses |
+| `PrismaModule` | Provides and exports the shared `PrismaService` |
+| `PrismaService` | Extends Prisma Client and manages database connection initialization and cleanup |
+
+The readiness request follows this path:
+
+```text
+HTTP request → AppController → AppService → PrismaService → PostgreSQL
+```
+
+The editable class diagram is located in the repository's `UML Diagrams` directory.
+
+## Organization Model
+
+An organization represents a company using CircuitIQ.
+
+| Field | Type | Purpose |
+|---|---|---|
+| `id` | String | Primary key with a Prisma-generated CUID default |
+| `name` | String | Company name |
+| `createdAt` | DateTime | Creation timestamp |
+| `updatedAt` | DateTime | Timestamp maintained by Prisma when updating a record |
+
+The current model does not yet contain employee memberships or relationships to assets, inspections, or work orders.
+
+An organization record alone does not enforce access control.
+
+## Development Checks
+
+Run these commands from `server`.
+
+### Compile the backend
+
+```powershell
+npm run build
+```
+
+### Run unit tests
+
+```powershell
+npm test
+```
+
+The current unit test checks the starter controller response. It uses a mocked `PrismaService` and does not connect to PostgreSQL.
+
+Prisma Client must still be generated because the test imports the Prisma service.
+
+### Run end-to-end tests
+
+```powershell
+npm run test:e2e
+```
+
+The current end-to-end test checks `GET /`. It initializes the real application, so it requires a configured environment, generated Prisma Client, and a reachable PostgreSQL database.
+
+### Run lint checks
+
+```powershell
+npm run lint
+```
+
+### Validate the Prisma schema
+
+```powershell
+npx prisma validate --config prisma7.config.ts
+```
+
+## Database Changes
+
+After intentionally modifying `prisma/schema.prisma`, create a development migration:
+
+```powershell
+npx prisma migrate dev --name describe_change --config prisma7.config.ts
+```
+
+Then regenerate Prisma Client:
+
+```powershell
+npx prisma generate --config prisma7.config.ts
+```
+
+Commit the schema and migration files. Do not commit the generated client.
+
+Use `migrate deploy` when applying existing committed migrations to another environment.
+
+## Stopping Local Services
+
+Stop the API with **Ctrl+C** in its terminal.
+
+Stop PostgreSQL with:
+
+```powershell
+docker compose stop
+```
+
+The database uses a named Docker volume, so stopping the container preserves its data.
+
+Changing credentials in `.env` does not automatically change credentials inside an already initialized PostgreSQL volume.
+
+## Troubleshooting
+
+| Problem | Check |
+|---|---|
+| `DATABASE_URL` is missing | Confirm `server/.env` exists and start the API from `server` |
+| PostgreSQL connection fails | Check Docker Desktop, `docker compose ps`, and matching credentials |
+| Generated Prisma import is missing | Run the Prisma generation command |
+| Organization table is missing | Apply the committed migrations |
+| Port is already in use | Stop the conflicting process or update the relevant port configuration |
+| Docker container fails to start | Run `docker compose logs postgres` |
+
+## Current Scope
+
+The mobile application already uses Firebase Authentication. Backend verification of Firebase ID tokens has not yet been implemented.
+
+The backend currently exposes only the starter and health/readiness endpoints. It does not yet provide:
+
+- Employee memberships and organization roles.
+- Organization-level authorization.
+- Asset, inspection, or work-order endpoints.
+- Dashboard queries.
+- Scan, OCR, review, and confirmation endpoints.
+
+Future company-data endpoints must verify the caller's identity and organization access on the server.
