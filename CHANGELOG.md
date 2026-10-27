@@ -2,6 +2,53 @@
 
 All notable changes to CircuitIQ will be documented in this file.
 
+## [Unreleased] — Backend Foundation
+### Updated: 2026-10-27
+### Branch: feature/backend-foundation
+
+### Added
+- NestJS backend application in the server directory.
+- GET /health endpoint for checking API availability.
+- GET /ready endpoint for checking database access through Prisma.
+- PostgreSQL 17 development database managed through Docker Compose.
+- Persistent Docker volume and PostgreSQL container health check.
+- Prisma configuration, schema, and initial Organization migration.
+- Organization model with id, name, createdAt, and updatedAt fields.
+- PrismaService for database access and connection lifecycle management.
+- PrismaModule for sharing PrismaService across backend modules.
+- Server environment-variable template in .env.example.
+- Class UML documentation in the UML Diagrams directory.
+
+### Changed
+- Configured NestJS to load server environment variables.
+- Updated AppService to query PostgreSQL for database readiness.
+- Updated AppController to expose the readiness endpoint.
+- Enabled application shutdown hooks for database connection cleanup.
+- Updated the starter controller test with a mock PrismaService.
+- Excluded the server directory from the mobile TypeScript project.
+- Added Git ignore rules for server credentials, generated Prisma code,
+  build output, and assistant files created during Prisma initialization.
+- Removed the root README from this branch.
+
+### Dependencies
+- Added Prisma CLI, Prisma Client, the PostgreSQL adapter, dotenv,
+  and @nestjs/config.
+- Removed the unused @nestjs/mau deployment dependency.
+- Applied compatible dependency updates and a Multer 2.5.0 override
+  to address the reported dependency vulnerability.
+
+### Verification
+- Backend build passed.
+- Mobile TypeScript check passed during backend setup.
+- Starter controller unit test passed: 1 test.
+- Prisma schema validation passed.
+- Organization migration applied successfully.
+- Prisma Client generation completed successfully.
+- Prisma CLI database connection test passed.
+- API health and database readiness checks passed in the browser.
+- npm audit reported 0 vulnerabilities at the dependency checkpoint.
+
+
 ## [0.2.0] - Authentication Foundation
 
 ### Added
