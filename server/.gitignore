@@ -1,0 +1,19 @@
+node_modules
+# Keep environment variables out of version control
+.env
+
+/src/generated/prisma
+
+.env
+.env.*
+!.env.example
+
+/node_modules/
+/dist/
+/src/generated/prisma/
+
+# Assistant files added during Prisma initialization
+/.agents/
+/.claude/
+/.windsurf/
+/skills-lock.json
