@@ -30,6 +30,7 @@ CircuitIQ is being developed to support electrical asset identification, equipme
 - NestJS
 - Prisma
 - PostgreSQL
+- Docker
 
 ## Development Environment
 
