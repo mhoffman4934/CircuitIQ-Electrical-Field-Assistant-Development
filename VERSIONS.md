@@ -8,19 +8,23 @@ Last audited: September 22, 2026
 
 |---|---|
 
-| Operating System | Windows |
-
 | Node.js | 24.21.0 |
 
-| npm | 11.19.0 |
+| TypeScript (backend) | 6.0.3 |
 
-| Git | [2.55.0.windows](http://2.55.0.windows).5 |
+| NestJS CLI used for scaffolding | 12.0.10 |
 
-| Java | JDK 17 |
+| @nestjs/platform-express | 12.2.0 |
 
-| Android Emulator | Pixel 7 |
+| Prisma CLI | 7.10.1 |
 
-| Android Runtime | Android 17 |
+| Prisma Client | 7.10.1 |
+
+| PostgreSQL Docker image | postgres:17 |
+
+| Vitest | 4.1.12 |
+
+| Multer override | 2.5.0 |
 
 ## Mobile
 
@@ -60,24 +64,30 @@ CircuitIQ uses a Pixel 7 Android Virtual Device running Android 17 as its primar
 
 Versions recorded here establish the baseline for future CircuitIQ version audits.
 
-## In-Progress 
+Prisma remains on version 7 for this implementation. 
 
-1. Finish dashboard design
-2. Build asset list/details UI
-3. Define asset + product-model data fields
-4. Set up NestJS
-5. Set up PostgreSQL + Prisma
-6. Connect real asset data
-7. Build scanning workflow
-8. Add inspections
-9. Add work orders
+Prisma 8 release-candidate adoption is deferred.
 
-React Native / Expo
-        ↓
-Firebase Authentication
-        ↓
-NestJS API
-        ↓
-Prisma
-        ↓
-PostgreSQL
+Multer is overridden to 2.5.0.
+
+The unused @nestjs/mau dependency was removed.
+
+  
+## Backend Configuration
+
+| Setting | Value |
+|---|---|
+| Backend framework | NestJS |
+| Backend language | TypeScript |
+| Module format | ESM |
+| Database | PostgreSQL |
+| ORM | Prisma |
+| Local API port | 3000 |
+| Local database address | 127.0.0.1:5432 |
+| Development database name | circuitiq |
+| Prisma configuration | server/prisma7.config.ts |
+| Prisma schema | server/prisma/schema.prisma |
+| Generated client location | server/src/generated/prisma |
+| Environment template | server/.env.example |
+
+
